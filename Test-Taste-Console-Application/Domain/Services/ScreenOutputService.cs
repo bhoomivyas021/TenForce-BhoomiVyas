@@ -8,7 +8,7 @@ using Test_Taste_Console_Application.Utilities;
 namespace Test_Taste_Console_Application.Domain.Services
 {
     /// <inheritdoc />
-    public class ScreenOutputService : IScreenOutputService
+    public class ScreenOutputService : IOutputService
     {
         private readonly IPlanetService _planetService;
 
@@ -20,7 +20,7 @@ namespace Test_Taste_Console_Application.Domain.Services
             _moonService = moonService;
         }
 
-        public void PrintAllPlanetsAndTheirMoonsToConsole()
+        public void OutputAllPlanetsAndTheirMoonsToConsole()
         {
             //The service gets all the planets from the API.
             var planets = _planetService.GetAllPlanets().ToArray();
@@ -99,7 +99,7 @@ namespace Test_Taste_Console_Application.Domain.Services
             }
         }
 
-        public void PrintAllMoonsAndTheirMassToConsole()
+        public void OutputAllMoonsAndTheirMassToConsole()
         {
             //The function works the same way as the PrintAllPlanetsAndTheirMoonsToConsole function. You can find more comments there.
             var moons = _moonService.GetAllMoons().ToArray();
@@ -143,7 +143,7 @@ namespace Test_Taste_Console_Application.Domain.Services
              */
         }
 
-        public void PrintAllPlanetsAndTheirAverageMoonTemperatureToConsole()
+        public void OutputAllPlanetsAndTheirAverageMoonGravityToConsole()
         {
             //The function works the same way as the PrintAllPlanetsAndTheirMoonsToConsole function. You can find more comments there.
             var planets = _planetService.GetAllPlanets().ToArray();
@@ -156,7 +156,7 @@ namespace Test_Taste_Console_Application.Domain.Services
             var columnSizes = new[] { 20, 30 };
             var columnLabels = new[]
             {
-                OutputString.PlanetId, OutputString.PlanetMoonAverageTemperature
+                OutputString.PlanetId, OutputString.PlanetMoonAverageGravity
             };
 
 
@@ -164,7 +164,14 @@ namespace Test_Taste_Console_Application.Domain.Services
 
             foreach(Planet planet in planets)
             {
-                ConsoleWriter.CreateText(new string [] { $"{planet.Id}", $"{planet.GetAvgTemperatureOfMoons()}" }, columnSizes);
+                if(planet.HasMoons())
+                {
+                    ConsoleWriter.CreateText(new string[] { $"{planet.Id}", $"{planet.AverageMoonGravity}" }, columnSizes);
+                }
+                else
+                {
+                    ConsoleWriter.CreateText(new string[] { $"{planet.Id}", $"-" }, columnSizes);
+                }
             }
 
             ConsoleWriter.CreateLine(columnSizes);
@@ -172,7 +179,7 @@ namespace Test_Taste_Console_Application.Domain.Services
             
             /*
                 --------------------+--------------------------------------------------
-                Planet's Number     |Planet's Average Moon Temperature
+                Planet's Number     |Planet's Average Moon Gravity
                 --------------------+--------------------------------------------------
                 1                   |0.0f
                 --------------------+--------------------------------------------------

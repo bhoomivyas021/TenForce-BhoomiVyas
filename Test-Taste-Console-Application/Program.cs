@@ -28,33 +28,19 @@ namespace Test_Taste_Console_Application
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
             //The service provider gets the services.
-            var fileOutputService = serviceProvider.GetService<IFileOutputService>();
-            var screenOutputService = serviceProvider.GetService<IScreenOutputService>();
+            var screenOutputService = serviceProvider.GetService<IOutputService>();
 
             try
             {
-                screenOutputService.PrintAllPlanetsAndTheirAverageMoonTemperatureToConsole();
-                screenOutputService.PrintAllMoonsAndTheirMassToConsole();
-                screenOutputService.PrintAllPlanetsAndTheirMoonsToConsole();
+                screenOutputService.OutputAllPlanetsAndTheirAverageMoonGravityToConsole();
+                screenOutputService.OutputAllMoonsAndTheirMassToConsole();
+                screenOutputService.OutputAllPlanetsAndTheirMoonsToConsole();
             }
             catch (Exception exception)
             {
                 //The users and developers can see the thrown exceptions.
                 Logger.Instance.Error($"{LoggerMessage.ScreenOutputOperationFailed}{exception.Message}");
                 Console.WriteLine($"{ExceptionMessage.ScreenOutputOperationFailed}{exception.Message}");
-            }
-
-            try
-            {
-                fileOutputService.WriteAllPlanetsAndTheirAverageMoonTemperatureToCSVFile();
-                fileOutputService.WriteAllMoonsAndTheirMassToCSVFile();
-                fileOutputService.WriteAllPlanetsAndTheirMoonsToCSVFile();
-            }
-            catch (Exception exception)
-            {
-                //The users and developers can see the thrown exceptions.
-                Logger.Instance.Error($"{LoggerMessage.FileOutputOperationFailed}{exception.Message}");
-                Console.WriteLine($"{ExceptionMessage.FileOutputOperationFailed}{exception.Message}");
             }
 
             serviceProvider.Dispose();
@@ -67,9 +53,8 @@ namespace Test_Taste_Console_Application
                 new FileInfo(ConfigurationFileName.Logger));
             serviceCollection.AddHttpClient<HttpClientService>();
             serviceCollection.AddSingleton<IPlanetService, PlanetService>();
-            serviceCollection.AddSingleton<IScreenOutputService, ScreenOutputService>();
+            serviceCollection.AddSingleton<IOutputService, ScreenOutputService>();
             serviceCollection.AddSingleton<IMoonService, MoonService>();
-            serviceCollection.AddSingleton<IFileOutputService, FileOutputService>();
         }
     }
 }
