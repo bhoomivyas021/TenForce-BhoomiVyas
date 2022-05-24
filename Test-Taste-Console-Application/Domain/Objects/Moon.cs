@@ -9,10 +9,6 @@ namespace Test_Taste_Console_Application.Domain.Objects
         public float MassValue { get; set; }
         public float MassExponent { get; set; }
 
-        public Moon()
-        {
-        }
-
         public Moon(MoonDto moonDto)
         {
             Id = moonDto.Id;

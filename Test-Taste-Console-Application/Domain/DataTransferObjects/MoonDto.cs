@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Linq;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Test_Taste_Console_Application.Domain.DataTransferObjects.JsonObjects;
 
@@ -17,6 +18,10 @@ namespace Test_Taste_Console_Application.Domain.DataTransferObjects
             get => Id;
             set => Id = value;
         }
+
+        //The path of the specific moon
+        [JsonProperty("rel")] public string Rel { get; set; }
+        public string URLId { get => Rel.Split('/').Last(); }
 
         //The path to the nested property is created by using a dot. 
         [JsonProperty("mass.massValue")] public float MassValue { get; set; }

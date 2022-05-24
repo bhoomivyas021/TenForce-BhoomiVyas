@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Text;
 using Newtonsoft.Json;
 using Test_Taste_Console_Application.Constants;
 using Test_Taste_Console_Application.Domain.DataTransferObjects;
@@ -22,7 +24,7 @@ namespace Test_Taste_Console_Application.Domain.Services
 
         public IEnumerable<Planet> GetAllPlanets()
         {
-            var allPlanetsWithMoons = new Collection<Planet>();
+            var allPlanetsWithTheirMoons = new Collection<Planet>();
 
             var response = _httpClientService.Client
                 .GetAsync(UriPath.GetAllPlanetsWithMoonsQueryParameters)
@@ -32,7 +34,7 @@ namespace Test_Taste_Console_Application.Domain.Services
             if (!response.IsSuccessStatusCode)
             {
                 Logger.Instance.Warn($"{LoggerMessage.GetRequestFailed}{response.StatusCode}");
-                return allPlanetsWithMoons;
+                return allPlanetsWithTheirMoons;
             }
 
             var content = response.Content.ReadAsStringAsync().Result;
@@ -41,18 +43,49 @@ namespace Test_Taste_Console_Application.Domain.Services
             var results = JsonConvert.DeserializeObject<JsonResult<PlanetDto>>(content);
 
             //The JSON converter can return a null object. 
-            if (results == null) return allPlanetsWithMoons;
+            if (results == null) return allPlanetsWithTheirMoons;
 
             //If the planet doesn't have any moons, then it isn't added to the collection.
             foreach (var planet in results.Bodies)
             {
-                if (planet.Moons != null)
+                if(planet.Moons != null)
                 {
-                    allPlanetsWithMoons.Add(new Planet(planet));
+                    var newMoonsCollection = new Collection<MoonDto>();
+                    foreach (var moon in planet.Moons)
+                    {
+                        var moonResponse = _httpClientService.Client
+                            .GetAsync(UriPath.GetMoonByIdQueryParameters + moon.URLId)
+                            .Result;
+                        var moonContent = moonResponse.Content.ReadAsStringAsync().Result;
+                        newMoonsCollection.Add(JsonConvert.DeserializeObject<MoonDto>(moonContent));
+                    }
+                    planet.Moons = newMoonsCollection;
+
+                }
+                allPlanetsWithTheirMoons.Add(new Planet(planet));
+            }
+
+            return allPlanetsWithTheirMoons;
+        }
+
+        private static string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder(capacity: normalizedString.Length);
+
+            for (int i = 0; i < normalizedString.Length; i++)
+            {
+                char c = normalizedString[i];
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
                 }
             }
 
-            return allPlanetsWithMoons;
+            return stringBuilder
+                .ToString()
+                .Normalize(NormalizationForm.FormC);
         }
     }
 }
