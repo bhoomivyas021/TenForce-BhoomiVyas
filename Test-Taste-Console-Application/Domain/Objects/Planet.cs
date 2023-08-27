@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Test_Taste_Console_Application.Domain.DataTransferObjects;
+using System.Linq;
 
 namespace Test_Taste_Console_Application.Domain.Objects
 {
@@ -10,9 +11,12 @@ namespace Test_Taste_Console_Application.Domain.Objects
         public string Id { get; set; }
         public float SemiMajorAxis { get; set; }
         public ICollection<Moon> Moons { get; set; }
-        public float AverageMoonGravity
+        //Calculate Averge Moon's grvity for the planet
+        //Earlier It was displaying 0.0f by default
+        //Converted float to decimal to round off the values
+        public decimal AverageMoonGravity
         {
-            get => 0.0f;
+            get => Math.Round(Moons.Select(x => x.Gravity).Average(), 3);
         }
 
         public Planet(PlanetDto planetDto)
@@ -20,7 +24,7 @@ namespace Test_Taste_Console_Application.Domain.Objects
             Id = planetDto.Id;
             SemiMajorAxis = planetDto.SemiMajorAxis;
             Moons = new Collection<Moon>();
-            if(planetDto.Moons != null)
+            if (planetDto.Moons != null)
             {
                 foreach (MoonDto moonDto in planetDto.Moons)
                 {

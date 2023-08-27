@@ -26,5 +26,6 @@ namespace Test_Taste_Console_Application.Domain.DataTransferObjects
         //The path to the nested property is created by using a dot. 
         [JsonProperty("mass.massValue")] public float MassValue { get; set; }
         [JsonProperty("mass.massExponent")] public float MassExponent { get; set; }
+        [JsonProperty("gravity")] public decimal Gravity { get; set; }
     }
 }
